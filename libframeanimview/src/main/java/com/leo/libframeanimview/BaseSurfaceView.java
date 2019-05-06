@@ -163,4 +163,7 @@ public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHold
      * @param canvas
      */
     protected abstract void onFrameDraw(Canvas canvas);
+
+    public abstract void start();
+    public abstract void stop();
 }

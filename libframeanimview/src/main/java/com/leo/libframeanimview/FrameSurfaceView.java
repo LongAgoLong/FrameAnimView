@@ -31,6 +31,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
     private Rect dstRect = new Rect();
     private int defaultWidth;
     private int defaultHeight;
+    private boolean running;
 
     public void setBitmaps(List<Integer> bitmaps) {
         if (bitmaps == null || bitmaps.size() == 0) {
@@ -108,7 +109,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
     @Override
     protected void onFrameDraw(Canvas canvas) {
         clearCanvas(canvas);
-        if (!isStart()) {
+        if (!isRunning()) {
             return;
         }
         if (!isFinish()) {
@@ -140,14 +141,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
      * invoked when frame animation is done
      */
     private void onFrameAnimationEnd() {
-        reset();
-    }
-
-    /**
-     * reset the index of bitmap, preparing for the next frame animation
-     */
-    private void reset() {
-        bitmapIndex = INVALID_BITMAP_INDEX;
+        stop();
     }
 
     /**
@@ -157,27 +151,34 @@ public class FrameSurfaceView extends BaseSurfaceView {
      */
     private boolean isFinish() {
         if (isRepeat()) {
-            return false;
+            return !isRunning();
+        } else {
+            return (!isRunning()) || (bitmapIndex >= bitmaps.size());
         }
-        return bitmapIndex >= bitmaps.size();
     }
 
-    /**
-     * whether frame animation is started
-     *
-     * @return true: animation is started, false: animation is not started
-     */
-    private boolean isStart() {
-        return bitmapIndex != INVALID_BITMAP_INDEX;
+    public boolean isRunning() {
+        return running;
     }
 
     /**
      * start frame animation which means draw list of bitmaps from 0 index
      */
+    @Override
     public void start() {
-        bitmapIndex = 0;
+        if (!isRunning()) {
+            running = true;
+            bitmapIndex = 0;
+        }
     }
 
+    @Override
+    public void stop() {
+        if (isRunning()) {
+            running = false;
+            bitmapIndex = INVALID_BITMAP_INDEX;
+        }
+    }
 
     /**
      * clear out the drawing on canvas,preparing for the next frame
