@@ -110,6 +110,12 @@ public class FrameSurfaceView extends BaseSurfaceView {
     protected void onFrameDraw(Canvas canvas) {
         clearCanvas(canvas);
         if (!isRunning()) {
+            // 重置为第一帧
+            if (!bitmaps.isEmpty()){
+                frameBitmap = decodeOriginBitmap(getResources(), bitmaps.get(0), options);
+                options.inBitmap = frameBitmap;
+                canvas.drawBitmap(frameBitmap, srcRect, dstRect, paint);
+            }
             return;
         }
         if (!isFinish()) {
@@ -166,6 +172,9 @@ public class FrameSurfaceView extends BaseSurfaceView {
      */
     @Override
     public void start() {
+        if (null == bitmaps || bitmaps.isEmpty()) {
+            throw new RuntimeException("must setBitmaps first");
+        }
         if (!isRunning()) {
             running = true;
             bitmapIndex = 0;
@@ -189,7 +198,6 @@ public class FrameSurfaceView extends BaseSurfaceView {
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
     }
-
 
     private Bitmap decodeOriginBitmap(Resources res, int resId, BitmapFactory.Options options) {
         options.inScaled = false;

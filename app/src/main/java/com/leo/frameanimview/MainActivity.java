@@ -38,9 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         if (null != mFrameSurfaceView) {
-            if (mFrameSurfaceView.isRunning()) {
-                mFrameSurfaceView.stop();
-            }
+            mFrameSurfaceView.stop();
             mFrameSurfaceView.recycle();
         }
     }
