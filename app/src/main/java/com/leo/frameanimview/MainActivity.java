@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mStopBtn = findViewById(R.id.stopBtn);
         mStopBtn.setOnClickListener(this);
         mFrameSurfaceView = findViewById(R.id.frameSurfaceView);
-        mFrameSurfaceView.setRepeat(true);
+        mFrameSurfaceView.setRepeat(false);
         mFrameSurfaceView.setFrameDuration(600);
         mFrameSurfaceView.setBitmaps(bitmaps);
     }

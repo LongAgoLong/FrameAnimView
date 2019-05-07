@@ -110,18 +110,14 @@ public class FrameSurfaceView extends BaseSurfaceView {
     protected void onFrameDraw(Canvas canvas) {
         clearCanvas(canvas);
         if (!isRunning()) {
-            // 重置为第一帧
-            if (!bitmaps.isEmpty()){
-                frameBitmap = decodeOriginBitmap(getResources(), bitmaps.get(0), options);
-                options.inBitmap = frameBitmap;
-                canvas.drawBitmap(frameBitmap, srcRect, dstRect, paint);
-            }
+            resetFirstFrame(canvas);
             return;
         }
         if (!isFinish()) {
             drawOneFrame(canvas);
         } else {
             onFrameAnimationEnd();
+            resetFirstFrame(canvas);
         }
     }
 
@@ -136,9 +132,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
             bitmapIndex = 0;
         }
         if (bitmapIndex < bitmaps.size()) {
-            frameBitmap = decodeOriginBitmap(getResources(), bitmaps.get(bitmapIndex), options);
-            options.inBitmap = frameBitmap;
-            canvas.drawBitmap(frameBitmap, srcRect, dstRect, paint);
+            drawBitmap(canvas, bitmapIndex);
         }
         bitmapIndex++;
     }
@@ -163,6 +157,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
         }
     }
 
+    @Override
     public boolean isRunning() {
         return running;
     }
@@ -173,7 +168,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
     @Override
     public void start() {
         if (null == bitmaps || bitmaps.isEmpty()) {
-            throw new RuntimeException("must setBitmaps first");
+            throw new RuntimeException("FrameSurfaceView must setBitmaps first");
         }
         if (!isRunning()) {
             running = true;
@@ -190,6 +185,23 @@ public class FrameSurfaceView extends BaseSurfaceView {
     }
 
     /**
+     * 重置为第一帧
+     *
+     * @param canvas
+     */
+    private void resetFirstFrame(Canvas canvas) {
+        if (!bitmaps.isEmpty()) {
+            drawBitmap(canvas, 0);
+        }
+    }
+
+    private void drawBitmap(Canvas canvas, int index) {
+        frameBitmap = decodeOriginBitmap(getResources(), bitmaps.get(index), options);
+        options.inBitmap = frameBitmap;
+        canvas.drawBitmap(frameBitmap, srcRect, dstRect, paint);
+    }
+
+    /**
      * clear out the drawing on canvas,preparing for the next frame
      * * @param canvas
      */
@@ -201,7 +213,6 @@ public class FrameSurfaceView extends BaseSurfaceView {
 
     private Bitmap decodeOriginBitmap(Resources res, int resId, BitmapFactory.Options options) {
         options.inScaled = false;
-        Bitmap bitmap = BitmapFactory.decodeResource(res, resId, options);
-        return bitmap;
+        return BitmapFactory.decodeResource(res, resId, options);
     }
 }
