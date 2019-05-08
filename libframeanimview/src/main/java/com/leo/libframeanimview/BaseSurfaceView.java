@@ -38,18 +38,6 @@ public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHold
         init();
     }
 
-    public void setFrameDuration(int frameDuration) {
-        this.frameDuration = frameDuration;
-    }
-
-    public void setRepeat(boolean repeat) {
-        isRepeat = repeat;
-    }
-
-    public boolean isRepeat() {
-        return isRepeat;
-    }
-
     protected void init() {
         getHolder().addCallback(this);
         setBackgroundTransparent();
@@ -120,7 +108,6 @@ public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHold
 
 
     private class SurfaceViewHandler extends Handler {
-
         public SurfaceViewHandler(Looper looper) {
             super(looper);
         }
@@ -150,6 +137,33 @@ public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHold
 
             handler.postDelayed(this, frameDuration);
         }
+    }
+
+    /**
+     * 设置帧间隔
+     *
+     * @param frameDuration
+     */
+    public void setFrameDuration(int frameDuration) {
+        this.frameDuration = frameDuration;
+    }
+
+    /**
+     * 是否循环播放
+     *
+     * @param repeat
+     */
+    public void setRepeat(boolean repeat) {
+        isRepeat = repeat;
+    }
+
+    /**
+     * 是否循环播放
+     *
+     * @return
+     */
+    public boolean isRepeat() {
+        return isRepeat;
     }
 
     /**
