@@ -10,7 +10,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
         defaultWidth = options.outWidth;
         defaultHeight = options.outHeight;
         srcRect = new Rect(0, 0, defaultWidth, defaultHeight);
-        Log.v(TAG, "FrameSurfaceView.getBitmapDimension()" + "  defaultWidth=" + defaultWidth + " defaultHeight=" + defaultHeight);
+//        Log.v(TAG, "FrameSurfaceView.getBitmapDimension()" + "  defaultWidth=" + defaultWidth + " defaultHeight=" + defaultHeight);
         //we have to re-measure to make defaultWidth in use in onMeasure()
         requestLayout();
 
@@ -100,7 +99,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
      * Usually it should be invoked when the ui of frame animation is no longer visible
      */
     public void recycle() {
-        if (frameBitmap != null) {
+        if (null != frameBitmap) {
             frameBitmap.recycle();
             frameBitmap = null;
         }
@@ -110,14 +109,14 @@ public class FrameSurfaceView extends BaseSurfaceView {
     protected void onFrameDraw(Canvas canvas) {
         clearCanvas(canvas);
         if (!isRunning()) {
-            resetFirstFrame(canvas);
+            resetFrame(canvas);
             return;
         }
         if (!isFinish()) {
             drawOneFrame(canvas);
         } else {
             onFrameAnimationEnd();
-            resetFirstFrame(canvas);
+            resetFrame(canvas);
         }
     }
 
@@ -127,7 +126,7 @@ public class FrameSurfaceView extends BaseSurfaceView {
      * @param canvas
      */
     private void drawOneFrame(Canvas canvas) {
-        Log.v(TAG, "ProgressRingSurfaceView.onFrameDraw()" + "  bitmapIndex=" + bitmapIndex + " measureWidth=" + getMeasuredWidth());
+//        Log.v(TAG, "ProgressRingSurfaceView.onFrameDraw()" + "  bitmapIndex=" + bitmapIndex + " measureWidth=" + getMeasuredWidth());
         if (isRepeat() && bitmapIndex >= bitmaps.size()) {
             bitmapIndex = 0;
         }
@@ -185,11 +184,11 @@ public class FrameSurfaceView extends BaseSurfaceView {
     }
 
     /**
-     * 重置为第一帧
+     * 重置为默认帧
      *
      * @param canvas
      */
-    private void resetFirstFrame(Canvas canvas) {
+    private void resetFrame(Canvas canvas) {
         if (!bitmaps.isEmpty()) {
             drawBitmap(canvas, 0);
         }

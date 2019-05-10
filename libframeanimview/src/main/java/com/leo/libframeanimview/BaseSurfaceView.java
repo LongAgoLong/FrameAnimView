@@ -8,7 +8,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -87,7 +86,7 @@ public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHold
         int width = widthMode == MeasureSpec.AT_MOST ? getDefaultWidth() : originWidth;
         int height = heightMode == MeasureSpec.AT_MOST ? getDefaultHeight() : originHeight;
         setMeasuredDimension(width, height);
-        Log.v(TAG, "BaseSurfaceView.onMeasure()" + "  default Width=" + getDefaultWidth() + " default height=" + getDefaultHeight());
+//        Log.v(TAG, "BaseSurfaceView.onMeasure()" + "  default Width=" + getDefaultWidth() + " default height=" + getDefaultHeight());
     }
 
     /**
