@@ -11,6 +11,8 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.lang.ref.WeakReference;
+
 public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = BaseSurfaceView.class.getSimpleName();
     public static final int DEFAULT_FRAME_DURATION_MILLISECOND = 50;
@@ -73,7 +75,7 @@ public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHold
         handlerThread = new HandlerThread("SurfaceViewThread");
         handlerThread.start();
         handler = new SurfaceViewHandler(handlerThread.getLooper());
-        handler.post(new DrawRunnable());
+        handler.post(new DrawRunnable(this));
     }
 
     @Override
@@ -106,7 +108,7 @@ public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHold
     protected abstract int getDefaultHeight();
 
 
-    private class SurfaceViewHandler extends Handler {
+    private static class SurfaceViewHandler extends Handler {
         public SurfaceViewHandler(Looper looper) {
             super(looper);
         }
@@ -117,24 +119,33 @@ public abstract class BaseSurfaceView extends SurfaceView implements SurfaceHold
         }
     }
 
-    private class DrawRunnable implements Runnable {
+    private static class DrawRunnable implements Runnable {
+        private final WeakReference<BaseSurfaceView> viewWReference;
+
+        public DrawRunnable(BaseSurfaceView baseSurfaceView) {
+            viewWReference = new WeakReference<>(baseSurfaceView);
+        }
 
         @Override
         public void run() {
-            if (!isAlive) {
+            BaseSurfaceView baseSurfaceView = viewWReference.get();
+            if (baseSurfaceView == null) {
+                return;
+            }
+            if (!baseSurfaceView.isAlive) {
                 return;
             }
             try {
-                canvas = getHolder().lockCanvas();
-                onFrameDraw(canvas);
+                baseSurfaceView.canvas = baseSurfaceView.getHolder().lockCanvas();
+                baseSurfaceView.onFrameDraw(baseSurfaceView.canvas);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                getHolder().unlockCanvasAndPost(canvas);
-                onFrameDrawFinish();
+                baseSurfaceView.getHolder().unlockCanvasAndPost(baseSurfaceView.canvas);
+                baseSurfaceView.onFrameDrawFinish();
             }
 
-            handler.postDelayed(this, frameDuration);
+            baseSurfaceView.handler.postDelayed(this, baseSurfaceView.frameDuration);
         }
     }
 

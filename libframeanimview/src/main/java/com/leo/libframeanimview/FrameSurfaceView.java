@@ -20,20 +20,21 @@ import java.util.List;
 public class FrameSurfaceView extends BaseSurfaceView {
     private static final String TAG = FrameSurfaceView.class.getSimpleName();
     public static final int INVALID_BITMAP_INDEX = Integer.MAX_VALUE;
+    private final Object mLock = new Object();
 
     private List<Integer> bitmaps = new ArrayList<>();
     private Bitmap frameBitmap;
     private int bitmapIndex = INVALID_BITMAP_INDEX;
-    private Paint paint = new Paint();
+    private final Paint paint = new Paint();
     private BitmapFactory.Options options;
     private Rect srcRect;
-    private Rect dstRect = new Rect();
+    private final Rect dstRect = new Rect();
     private int defaultWidth;
     private int defaultHeight;
     private boolean running;
 
     public void setBitmaps(List<Integer> bitmaps) {
-        if (bitmaps == null || bitmaps.size() == 0) {
+        if (bitmaps == null || bitmaps.isEmpty()) {
             return;
         }
         this.bitmaps = bitmaps;
@@ -126,11 +127,11 @@ public class FrameSurfaceView extends BaseSurfaceView {
      * @param canvas
      */
     private void drawOneFrame(Canvas canvas) {
-//        Log.v(TAG, "ProgressRingSurfaceView.onFrameDraw()" + "  bitmapIndex=" + bitmapIndex + " measureWidth=" + getMeasuredWidth());
-        if (isRepeat() && bitmapIndex >= bitmaps.size()) {
-            bitmapIndex = 0;
+        int size = bitmaps.size();
+        if (isRepeat()) {
+            bitmapIndex = bitmapIndex % size;
         }
-        if (bitmapIndex < bitmaps.size()) {
+        if (bitmapIndex < size) {
             drawBitmap(canvas, bitmapIndex);
         }
         bitmapIndex++;
@@ -169,17 +170,21 @@ public class FrameSurfaceView extends BaseSurfaceView {
         if (null == bitmaps || bitmaps.isEmpty()) {
             throw new RuntimeException("FrameSurfaceView must setBitmaps first");
         }
-        if (!isRunning()) {
-            running = true;
-            bitmapIndex = 0;
+        synchronized (mLock) {
+            if (!isRunning()) {
+                running = true;
+                bitmapIndex = 0;
+            }
         }
     }
 
     @Override
     public void stop() {
-        if (isRunning()) {
-            running = false;
-            bitmapIndex = INVALID_BITMAP_INDEX;
+        synchronized (mLock) {
+            if (isRunning()) {
+                running = false;
+                bitmapIndex = INVALID_BITMAP_INDEX;
+            }
         }
     }
 
